@@ -8,7 +8,7 @@
 //import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:college_mess_management/main.dart';
+import 'package:college_mess_management/placeOrder.dart';
 
 void main() {
   testWidgets('App UI Test', (WidgetTester tester) async {
