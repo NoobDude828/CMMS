@@ -1,4 +1,4 @@
-# college_mess_management
+# college_mess_management_app_flutter
 
 A new Flutter project.
 
