@@ -8,12 +8,12 @@
 //import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:college_mess_management/placeOrder.dart';
+import 'package:college_mess_management/main.dart';
 
 void main() {
   testWidgets('App UI Test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+    await tester.pumpWidget(const MyApp());
 
     // Verify that the title "My Flutter App" is displayed.
     expect(find.text('My Flutter App'), findsOneWidget);

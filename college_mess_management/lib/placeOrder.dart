@@ -1,169 +1,306 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-void main() {
-  runApp(MyApp());
-}
+class PlaceOrder extends StatefulWidget {
+  const PlaceOrder({super.key});
 
-class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _PlaceOrderState createState() => _PlaceOrderState();
 }
-class _MyAppState extends State<MyApp> {
+
+class _PlaceOrderState extends State<PlaceOrder> {
   int itemCount = 3; // Initial number of items
   List<ItemData> itemDataList = List.generate(3, (index) => ItemData());
-  String? selectedVendor; // Create a state variable to store the selected value
+  String? selectedVendor; 
+  String? grandTotalDisplay;// Create a state variable to store the selected value
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 75,
-          title: const Text(
-            'College Mess Management System',
-            style: TextStyle(fontSize: 13.0),
-          ),
-          backgroundColor: const Color(0xFF0028A8),
-          centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              // Add functionality to navigate back
-            },
-          ),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                // Handle menu item selection
-                if (value == 'logout') {
-                  // Handle logout action
-                } else if (value == 'profile') {
-                  // Handle profile action
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'logout',
-                  child: Text('Logout'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'profile',
-                  child: Text('Your Profile'),
-                ),
-              ],
-            ),
-          ],
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(45),
-              bottomRight: Radius.circular(45),
-            ),
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 15),
-              const Center(
-                child: Text(
-                  'Place Your Orders',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24.0,
-                  ),
+  List<ItemData> riceAndGrainsItems = List.generate(3, (index) => ItemData());
+  List<ItemData> meatAndDairyItems = List.generate(3, (index) => ItemData());
+  List<ItemData> vegetableItems = List.generate(3, (index) => ItemData());
+
+Map<String, String> vendorEmails = {
+  'Rice and Grains': 'rice@example.com',
+  'Vegetables': 'vegetables@example.com',
+  'Meat and Dairy': 'meat@example.com',
+};
+Future<void> sendOrder() async {
+if (selectedVendor != null) {
+    String vendorEmail = vendorEmails[selectedVendor] ?? ''; // Look up the email address
+    if (vendorEmail.isNotEmpty) {
+      // Create a subject for the email
+      String subject ='Order from CST Mess';
+
+      // Create a table with headers and order details
+      String table = '\nDetails:\n\nItem\t\tQuantity\tRate\n';
+
+      for (int i = 0; i < itemDataList.length; i++) {
+        String item = (itemDataList[i].itemController.text);
+        String quantity = itemDataList[i].quantityController.text;
+        String rate = itemDataList[i].rateController.text;
+
+        table +=    '$item''\t\t''$quantity''kg\t\t''Nu.''$rate''/kg\n''';
+      }
+
+      // Construct the mailto URL
+      final Uri emailUri = Uri(
+        scheme: 'mailto',
+        path: vendorEmail, // Use the vendor's email address as the recipient
+        queryParameters: {
+          'subject': Uri.decodeComponent(subject),
+          'body': Uri.decodeComponent(table),
+        },
+      );
+
+      // Launch the email app with the mailto URL
+      await launch(emailUri.toString());
+    } else {
+      // Handle the case when the selected vendor does not have a valid email address.
+    }
+  } else {
+    // Handle the case when no vendor is selected.
+  }
+}
+
+void onOrderSentCallback() {
+  // Implement the desired action to be performed after the order is sent
+}
+
+
+  double calculateGrandTotal() {
+    double grandTotal = 0.0;
+    for (ItemData item in itemDataList) {
+      double quantity = double.tryParse(item.quantityController.text) ?? 0.0;
+      double rate = double.tryParse(item.rateController.text) ?? 0.0;
+      grandTotal += (quantity * rate);
+    }
+    return grandTotal;
+  }
+
+
+@override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    home: Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 15),
+            const Center(
+              child: Text(
+                'Place Your Order',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24.0,
                 ),
               ),
-              const SizedBox(height: 10),
-                Center(
-                  child: Column(
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: Column(
                 children: [
-                      Center(
-                      child: Column(
-                        children: [
-                          ClipRRect( // Wrap the container with ClipRRect to round its corners
-                            borderRadius: BorderRadius.circular(10.0), // Set the border radius as needed
-                            child: Container(
-                              width: 250, // Set the width to the desired value
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFFF6600), // Set the background color of the entire dropdown box
-                              ),
-                              child: Center( // Center the content and button inside the dropdown
-                                child: DropdownButton<String>(
-                                  value: selectedVendor, // Set the value to the selected value
-                                  hint: const Text(
-                                    'Select Vendor',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        ),
-                                    ),
-                                  items: <String>[
-                                    'Rice and Grains',
-                                    'Vegetables',
-                                    'Meat and Dairy',
-                                  ].map((String value) {
-                                    return CustomDropdownMenuItem( // Use the custom widget
-                                      value: value,
-                                      child: Center( // Center the content inside the dropdown
-                                        child: Text(
-                                          value,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      selectedVendor = newValue; // Update the selected value
-                                    });
-                                  },
-                                  style: const TextStyle(
+                  Center(
+                    child: Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Container(
+                            width: 250,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFF6600),
+                            ),
+                            child: Center(
+                              child: DropdownButton<String>(
+                                value: selectedVendor,
+                                hint: const Text(
+                                  'Select Vendor',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
                                     color: Colors.white,
                                   ),
-                                  dropdownColor: const Color(0xFFFF6600),
                                 ),
+                                items: <String>[
+                                  'Rice and Grains',
+                                  'Vegetables',
+                                  'Meat and Dairy',
+                                ].map((String value) {
+                                  return CustomDropdownMenuItem(
+                                    value: value,
+                                    child: Center(
+                                      child: Text(
+                                        value,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    selectedVendor = newValue;
+                                    if (selectedVendor == 'Rice and Grains') {
+                                      itemDataList = riceAndGrainsItems;
+                                    } else if (selectedVendor == 'Meat and Dairy') {
+                                      itemDataList = meatAndDairyItems;
+                                    } else if (selectedVendor == 'Vegetables') {
+                                      itemDataList = vegetableItems;
+                                    }
+                                  });
+                                },
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                ),
+                                dropdownColor: const Color(0xFFFF6600),
                               ),
                             ),
                           ),
-                          if (selectedVendor != null) // Display the selected value with spacing
-                            Padding(
-                              padding: EdgeInsets.only(top: 16.0), // Adjust the top padding as needed
-                              child: Text('Selected Vendor for: $selectedVendor'),
-                            ),
-                        ],
-                      ),
+                        ),
+                        if (selectedVendor != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16.0),
+                            child: Text('Selected Vendor for: $selectedVendor'),
+                          ),
+                      ],
                     ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: orders(generateDataRows(itemDataList)),
+            ),
+            const SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF6600),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    minimumSize: const Size(100, 50),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      itemCount++;
+                      itemDataList.add(ItemData());
+                    });
+                  },
+                  child: const Text(
+                    "Add Item",
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              // Make the DataTable scrollable
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: editableDataTable(generateDataRows(itemDataList)),
-              ),
-              SizedBox(height: 20),
+                const SizedBox(width: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF6600),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    minimumSize: const Size(100, 50),
+                  ),
+                  onPressed: () {
+                    if (itemCount > 0) {
+                      setState(() {
+                        itemCount--;
+                        itemDataList.removeLast();
+                      });
+                    }
+                  },
+                  child: const Text(
+                    "Remove Item",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF6600),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    minimumSize: const Size(150, 50),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      grandTotalDisplay = calculateGrandTotal().toStringAsFixed(2);
+                    });
+                  },
+                  child: const Text(
+                    "Grand Total",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Text( 
+                  grandTotalDisplay = 'Nu. ' + (calculateGrandTotal().toStringAsFixed(2)), // Display the grand total text here
+                  style: const TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
               ElevatedButton(
-                onPressed: () {
-                  // Increment itemCount to add a new row
-                  setState(() {
-                    itemCount++;
-                    itemDataList.add(ItemData());
-                  });
-                },
-                child: Text("Add Items"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF6600),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                minimumSize: const Size(100, 50),
               ),
-            SizedBox(height: 20)
-            ],
-          ),
+              onPressed: () {
+                sendOrder();
+              },
+              child: const Text(
+                'Confirm',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            const SizedBox(width: 20),
+
+              ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF6600),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                minimumSize: const Size(100, 50),
+              ),
+              onPressed: () {
+                sendOrder();
+              },
+              child: const Text(
+                'Send Order',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+
+          ],
         ),
       ),
-    );
-  }
-  DataTable editableDataTable(List<DataRow> dataRows) {
+    ),
+  );
+}
+
+  DataTable orders(List<DataRow> dataRows) {
     return DataTable(
       columns: const [
         DataColumn(
@@ -234,13 +371,14 @@ class _MyAppState extends State<MyApp> {
     return dataRows;
   }
 }
+
 class ItemData {
   final TextEditingController itemController = TextEditingController();
   final TextEditingController quantityController = TextEditingController();
   final TextEditingController rateController = TextEditingController();
 }
 class CustomDropdownMenuItem<T> extends DropdownMenuItem<T> {
-  CustomDropdownMenuItem({
+  CustomDropdownMenuItem({super.key, 
     required T value,
     required Widget child,
   }) : super(
@@ -251,6 +389,3 @@ class CustomDropdownMenuItem<T> extends DropdownMenuItem<T> {
           ),
         );
 }
-
-
-

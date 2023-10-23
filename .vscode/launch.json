@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "college_mess_management",
+            "cwd": "college_mess_management",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart" // Add this line to specify the entry point
+        },
+        {
+            "name": "college_mess_management (profile mode)",
+            "cwd": "college_mess_management",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart", // Add this line to specify the entry point
+            "flutterMode": "profile"
+        },
+        {
+            "name": "college_mess_management (release mode)",
+            "cwd": "college_mess_management",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart", // Add this line to specify the entry point
+            "flutterMode": "release"
+        }
+    ]
+}
