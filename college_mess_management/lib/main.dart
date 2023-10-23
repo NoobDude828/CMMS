@@ -76,7 +76,7 @@ class MessManagerScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: MessManager(), 
+      body: const MessManager(), 
           bottomNavigationBar: Container(
           height: 90,
           child: ClipRRect(
@@ -219,7 +219,7 @@ class PlanTimetableScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: PlanTimetable(), // Display the body content from PlanTimetable.dart
+      body: const PlanTimetable(), // Display the body content from PlanTimetable.dart
 
           bottomNavigationBar: Container(
           height: 90,
@@ -433,7 +433,7 @@ class StudentScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Student(),
+      body: const Student(),
           bottomNavigationBar: Container(
           height: 90,
           child: ClipRRect(
@@ -644,7 +644,7 @@ class ProvideFeedbackScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ProvideFeedback(), // Display the body content from PlanTimetable.dart
+      body: const ProvideFeedback(), // Display the body content from PlanTimetable.dart
           bottomNavigationBar: Container(
           height: 90,
           child: ClipRRect(
